@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Burak Electron</title>
+        <link rel="stylesheet" href="assets/bootstrap.min.css">
+    </head>
+    <body>
+        <h1> Yeni Pencere </h1>
+        Adress : <input id="IPInput"> </br>
+        Port : <input id="portInput"> </br>
+        <button id="confirmBtn"> Confirm </button>
+
+
+
+        <script type="text/javascript">
+            const electron = require("electron");
+            const  {ipcRenderer} = electron;
+
+            let confirmBtn = document.querySelector("#confirmBtn");
+            let ipInput = document.querySelector("#IPInput");
+            let portInput = document.querySelector("#portInput")
+
+            confirmBtn.addEventListener("click", ()=> {
+                ipcRenderer.send("key:connectionData",{
+                    ip : ipInput.value,
+                    port : portInput.value,
+                })
+            })           
+
+
+        </script>
+    </body>
+</html>

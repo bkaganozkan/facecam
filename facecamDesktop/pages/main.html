@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Burak Electron</title>
+        <link rel="stylesheet" href="assets/bootstrap.min.css">
+    </head>
+    <body>
+        <h1> Test Alanı </h1>
+        <img src="../man.png" width="500" height="300" id="mainStream">
+        <button class="btn btn-primary" id="sendBtn"> Send  </button>
+        <input type="text" id="inputValue">
+        <button id="newWindow"> Yeni Pencere</button>
+    
+        <h2 id="ipValue"></h2>
+        <h2 id="portValue"></h2>
+
+        <script >
+            const electron = require("electron");
+            const  {ipcRenderer} = electron;
+
+            let sendBtn = document.querySelector("#sendBtn");
+            let inputValue = document.querySelector("#inputValue");
+            let newWindow = document.querySelector("#newWindow")
+            let mainStream = document.querySelector("#mainStream")
+            let ipValue = document.querySelector("#ipValue")
+            let portValue = document.querySelector("#portValue")
+            
+
+            newWindow.addEventListener("click", ()=>{
+                ipcRenderer.send("key:newWindow")
+            })
+
+            mainStream.addEventListener("click", () => {
+                ipcRenderer.send("key:connectionWindow")
+            })
+
+            sendBtn.addEventListener("click", () => {
+                console.log("test");
+                ipcRenderer.send("key:inputValue", inputValue.value)                
+            });
+            
+            ipcRenderer.on("connectionData", (err, data) => {
+                if (data.ip && data.port){
+                ipValue.innerText = "IP Adress : " + data.ip
+                portValue.innerText = "Port Number : " + data.port
+                console.log(data.ip)
+                }
+            })
+        </script>
+    </body>
+</html>
+
