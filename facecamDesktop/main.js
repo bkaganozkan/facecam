@@ -1,6 +1,7 @@
 const path = require('path')
 const  electron = require('electron')
 const url = require("url");
+const fs = require('fs')
 const { Menu, ipcRenderer } = require('electron');
 const createConnectionWindow = require("./connection")
 const dgram = require("dgram")
@@ -15,7 +16,9 @@ let IP = "192.168.0.16"
 let port = 3000
 
 
-app.on('ready', () =>{    
+app.on('ready', () =>{
+
+    // Created Main Menu
     mainWindow = new BrowserWindow({
         title:" FaceApp",
         height : 700,
@@ -27,7 +30,7 @@ app.on('ready', () =>{
             enableRemoteModule: true
         }
     });
-
+    // Main Menu HTML
     mainWindow.loadURL(
         url.format({
             pathname: path.join(__dirname,"pages/main.html"),
@@ -35,25 +38,18 @@ app.on('ready', () =>{
             slashes : true,
         })
     )
-    const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
-    Menu.setApplicationMenu(mainMenu)
 
-     ipcMain.on("key:inputValue", (err, data) => {
-        console.log(data)
-        
-    })
-
-    ipcMain.on("key:newWindow", () => {
-        //createWindow()
-    })
-
+    // Run function when menu closed
     mainWindow.on("close", ()=>{
         app.quit()
     })
+
+    // Created connection Window, recieved key
     ipcMain.on("key:connectionWindow", () => {
         connectionWindow = createConnectionWindow();
     })
-    // IP ve Port dataları buradan alınıyor
+
+    // get ip & port datas from ./connection 
     ipcMain.on("key:connectionData", (err,data) =>{        
         if (data.port ){   
             IP = toString(data.ip)
@@ -61,45 +57,27 @@ app.on('ready', () =>{
             connectionWindow.close();
         }
         mainWindow.webContents.send("connectionData", data)
+        
         connect(IP,port)
+              
            
     })
-
+    
+    // UDP connection, run function when message recieved
     const connect = (ipAddress, port) => {
         
-        server.on('message', (msg, err) => {
-            console.log(msg)
-
-        } )
-
-        server.bind({
-            port : port,
-             address:ipAddress,           
-            exclusive : true,
+        server.on("message", (msg, info) => {
+            console.log("data alindi")
+            //edMsg = String.fromCharCode.apply(null, new Uint8Array(msg));
+            mainWindow.webContents.send("Test", msg)  
         })
 
-        
-        
-    
+        // bind to port and local
+        server.bind({
+            port : port,                      
+            exclusive : true,
+        })
     }
+        
 })
-
-const mainMenuTemplate = [
-    {
-        label : "Dosya",
-        submenu : [
-            {
-                label : "Yeni"
-            },
-            {
-                label : "Test 1"
-            }
-        ]
-    }
-]
-
-
-
-
-
 
